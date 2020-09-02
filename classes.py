@@ -262,40 +262,57 @@ class PickledSites:
 
 
 class Weather:
-    """Class represents weather at the given place.
+    """Class represents weather at the given place and time.
 
-    TODO: finish this text -> Class shows temp, humid, pm25,... in specific location or installation...
-    TODO: work on history data and predicitions
+    Class shows temp, humid, pressure, PM1, PM10, PM25 (+-) in specific location or installation.
     """
+    #TODO: work on history data and predicitions
 
     def __init__(self):
         self.weather_json = None
         self.latitude = None
         self.longtitude = None
+        self.datetime = None
         self.measurements = dict.fromkeys(
             ['PM1', 'PM10', 'PM25', 'PRESSURE', 'HUMIDITY', 'TEMPERATURE'], None)
 
-    def process_weather_data(self, weather_json):
-        self.weather_json = json.loads(weather_json)
-        current_data = self.weather_json['current']
-        #print('CURRENT DATA = ', current_data)
-        data_from_datetime = dateutil.parser.parse(
-            current_data['fromDateTime']).strftime("%Y-%m-%d %H:%M:%S")
-        data_till_datetime = dateutil.parser.parse(
-            current_data['tillDateTime']).strftime("%Y-%m-%d %H:%M:%S")
+        self.standards = {}
+        self.indexes = {}
 
-        #print(f'Measuring from {data_from_datetime} to {data_till_datetime}.')
-        for meas in current_data['values']:
+    def _process_current_data(self, weather_data):
+
+        data_from_datetime = dateutil.parser.parse(
+            weather_data['fromDateTime']).strftime("%Y-%m-%d %H:%M:%S")
+        data_till_datetime = dateutil.parser.parse(
+            weather_data['tillDateTime']).strftime("%Y-%m-%d %H:%M:%S")
+        self.datetime = data_till_datetime
+        # print(f'Measuring from {data_from_datetime} to {data_till_datetime}.')
+
+        for meas in weather_data['values']:
             if meas['name'] in self.measurements:
                 self.measurements[meas['name']] = meas['value']
-        #print('MEASUREMENTS =', self.measurements)
-        '''
-        for index in current_data['indexes']:
-            print('INDEX:', index)
 
-        for standard in current_data['standards']:
-            print('STANDARD:', standard)
-        '''
+    def _process_indexes(self, indexes_list):
+        for index in indexes_list:
+            index_info = {'value': index['value'], 'level': index['level'],
+                          'description': index['description'], 'color': index['color']}
+            self.indexes[index['name']] = index_info
+        #print('INDEXES: ', self.indexes)
 
-    def print_current_data(self):
-        pass
+    def _process_standards(self, standards_list):
+        for standard in standards_list:
+            standard_info = {'authority': standard['name'], 'limit': standard['limit']}
+            self.standards[standard['pollutant']] = standard_info
+        #print('STANDARDS: ', self.standards)
+
+    def process_weather_data(self, weather_json):
+        """Process json data about weather and store it in class variables"""
+        self.weather_json = json.loads(weather_json)
+        current_data = self.weather_json['current']
+
+        self._process_current_data(current_data)
+        self._process_indexes(current_data['indexes'])
+        self._process_standards(current_data['standards'])
+
+
+
