@@ -264,7 +264,8 @@ class PickledSites:
 class Weather:
     """Class represents weather at the given place and time.
 
-    Class shows temp, humid, pressure, PM1, PM10, PM25 (+-) in specific location or installation.
+    Class shows indexes, standards, temp, humid, pressure, PM1, PM10, PM25 (+-)
+    in specific location or installation.
     """
     #TODO: work on history data and predicitions
 
@@ -276,8 +277,8 @@ class Weather:
         self.measurements = dict.fromkeys(
             ['PM1', 'PM10', 'PM25', 'PRESSURE', 'HUMIDITY', 'TEMPERATURE'], None)
 
-        self.standards = {}
-        self.indexes = {}
+        self.standards = []
+        self.indexes = []
 
     def _process_current_data(self, weather_data):
 
@@ -294,15 +295,16 @@ class Weather:
 
     def _process_indexes(self, indexes_list):
         for index in indexes_list:
-            index_info = {'value': index['value'], 'level': index['level'],
+            index_info = {'name': index['name'], 'value': index['value'], 'level': index['level'],
                           'description': index['description'], 'color': index['color']}
-            self.indexes[index['name']] = index_info
+            self.indexes.append(index_info)
         #print('INDEXES: ', self.indexes)
 
     def _process_standards(self, standards_list):
         for standard in standards_list:
-            standard_info = {'authority': standard['name'], 'limit': standard['limit']}
-            self.standards[standard['pollutant']] = standard_info
+            standard_info = {'pollutant': standard['pollutant'],
+                             'authority': standard['name'], 'limit': standard['limit']}
+            self.standards.append(standard_info)
         #print('STANDARDS: ', self.standards)
 
     def process_weather_data(self, weather_json):
