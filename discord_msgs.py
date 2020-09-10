@@ -1,23 +1,21 @@
-import http.client
+import requests
+import json
 
-def send_msg(message, webhookurl):
 
-    # compile the form data (BOUNDARY can be anything)
-    formdata = "------:::BOUNDARY:::\r\nContent-Disposition: form-data; " \
-               "name=\"content\"\r\n\r\n" + message + "\r\n------:::BOUNDARY:::--"
-    formdata = formdata.encode(encoding='UTF-8')
+def send_msg(webhookurl, message="@here Your info is here!", *, embed=None, bot_name='temp'):
+    data = {}
+    data['content'] = message
+    data['username'] = bot_name
+    if embed:
+        data['embeds'] = []
+        data['embeds'].append(embed)
 
-    # get the connection and make the request
-    connection = http.client.HTTPSConnection("discordapp.com")
-    connection.request("POST", webhookurl, formdata, {
-        'content-type': "multipart/form-data; boundary=----:::BOUNDARY:::",
-        'cache-control': "no-cache",
-        'charset': "UTF-8"
-    })
+    result = requests.post(webhookurl, data=json.dumps(data), headers={'Content-Type': 'application/json'})
 
-    # get the response
-    response = connection.getresponse()
-    result = response.read()
-
-    # return back to the calling function with the result
-    return result.decode("utf-8")
+    try:
+        result.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(err)
+    else:
+        # print("Payload delivered successfully, code {}.".format(result.status_code))
+        pass
