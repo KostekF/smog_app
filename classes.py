@@ -33,7 +33,7 @@ class AirlyApi:
         if req.status_code != 200:
             print("error with request")
             print(req.status_code)
-        return req
+        return req.text
 
     def get_installations_nearest(self, latitude, longtitude, max_dist_km, max_results):
         """Endpoint returns list of installations which are closest to a given point,
@@ -56,7 +56,7 @@ class AirlyApi:
         if req.status_code != 200:
             print("error with request")
             print(req.status_code)
-        return req
+        return req.text
 
     def get_measurement(self, installation_id):
         """Endpoint returns measurements for concrete installation given by installation_id.
@@ -75,7 +75,7 @@ class AirlyApi:
         if req.status_code != 200:
             print("error with request")
             print(req.status_code)
-        return req
+        return req.text
 
     def get_measurement_nearest(self, latitude, longtitude, max_dist_km):
         """Endpoint returns measurements for an installation closest to a given location.
@@ -98,7 +98,7 @@ class AirlyApi:
         if req.status_code != 200:
             print("error with request")
             print(req.status_code)
-        return req
+        return req.text
 
     def get_measurement_point(self, latitude, longtitude):
         """Endpoint returns approx. measurements for any geographical location.
@@ -122,7 +122,7 @@ class AirlyApi:
         if req.status_code != 200:
             print("error with request")
             print(req.status_code)
-        return req
+        return req.text
 
     def get_meta_indexes(self):
         """Endpoint returns a list of all the index types supported in the API along with lists
@@ -142,7 +142,7 @@ class AirlyApi:
         if req.status_code != 200:
             print("error with request")
             print(req.status_code)
-        return req
+        return req.text
 
     def get_meta_measurements(self):
         """Endpoint returns list of all the measurement types supported in the API along with
@@ -162,7 +162,7 @@ class AirlyApi:
         if req.status_code != 200:
             print("error with request")
             print(req.status_code)
-        return req
+        return req.text
 
 
 class PickledSites:
@@ -303,7 +303,7 @@ class Weather:
     def _process_standards(self, standards_list):
         for standard in standards_list:
             standard_info = {'pollutant': standard['pollutant'],
-                             'authority': standard['name'], 'limit': standard['limit']}
+                             'name': standard['name'], 'limit': standard['limit']}
             self.standards.append(standard_info)
         #print('STANDARDS: ', self.standards)
 
